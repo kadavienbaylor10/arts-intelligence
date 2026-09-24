@@ -5,7 +5,8 @@
   python -m ai.run extract      # LLM-extract opportunities from changed snapshots
   python -m ai.run verify       # re-evaluate status, expire past deadlines, schedule reviews
   python -m ai.run calendar     # write calendar.ics (and upload if Supabase storage is configured)
-  python -m ai.run daily        # fetch + extract + verify + calendar
+  python -m ai.run digest       # email the daily digest (needs RESEND_API_KEY and DIGEST_TO)
+  python -m ai.run daily        # fetch + extract + verify + calendar + digest
 """
 import csv
 import re
@@ -317,6 +318,24 @@ def cmd_calendar(out_path="calendar.ics"):
     print(f"wrote {len(events)} events to {out_path}")
 
 
+def cmd_digest():
+    from . import digest
+    if not (config.RESEND_API_KEY and config.DIGEST_TO):
+        print("digest skipped: RESEND_API_KEY or DIGEST_TO not set")
+        return
+    with db.connect() as conn:
+        data = digest.gather(conn)
+        subject, html = digest.render(data)
+        digest.send(config.RESEND_API_KEY, config.DIGEST_FROM, config.DIGEST_TO, subject, html)
+        if data["changes"]:
+            conn.execute("UPDATE opportunity_changes SET alerted = TRUE WHERE id = ANY(%s)",
+                         ([c["id"] for c in data["changes"]],))
+        conn.execute("INSERT INTO reports (kind, period_start, period_end, body_md) VALUES "
+                     "('alert', current_date, current_date, %s)", (html,))
+        conn.commit()
+    print(f"digest sent to {config.DIGEST_TO}: {subject}")
+
+
 def main(argv):
     if not argv:
         print(__doc__)
@@ -332,8 +351,14 @@ def main(argv):
         cmd_verify()
     elif cmd == "calendar":
         cmd_calendar()
+    elif cmd == "digest":
+        cmd_digest()
     elif cmd == "daily":
         cmd_fetch(); cmd_extract(); cmd_verify(); cmd_calendar()
+        try:
+            cmd_digest()
+        except Exception as e:  # noqa: BLE001 - a mail problem must not fail the scan
+            print(f"digest failed: {e}")
     else:
         print(__doc__)
 

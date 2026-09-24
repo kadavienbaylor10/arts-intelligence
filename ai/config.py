@@ -19,6 +19,11 @@ MAX_EXTRACTIONS_PER_RUN = int(_env("MAX_EXTRACTIONS_PER_RUN", "60"))
 USER_AGENT = _env("USER_AGENT", "Mozilla/5.0 (compatible; ArtsIntelligenceBot/0.1; research)")
 SUPABASE_URL = _env("SUPABASE_URL", "")
 SUPABASE_SERVICE_KEY = _env("SUPABASE_SERVICE_KEY", "")
+RESEND_API_KEY = _env("RESEND_API_KEY", "")
+DIGEST_TO = _env("DIGEST_TO", "")
+# Resend's test sender only delivers to the email address your Resend account uses,
+# unless you verify your own domain in Resend and change this.
+DIGEST_FROM = _env("DIGEST_FROM", "Arts Intelligence <onboarding@resend.dev>")
 
-# Rough per-million-token prices used only for the job_runs cost estimate.
+# Rough per-million-token prices used only for the job_runs cost estimate. Check current pricing.
 PRICE_PER_MTOK = {"input": 1.00, "output": 5.00}
