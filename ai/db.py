@@ -36,7 +36,8 @@ def record_fetch(conn, source, url, status, text, changed, content_hash, robots_
 
 def record_failure(conn, source_id, err):
     conn.execute("""UPDATE sources SET last_fetched_at = now(), consecutive_failures = consecutive_failures + 1,
-                    active = consecutive_failures + 1 < 5 WHERE id = %s""", (source_id,))
+                    active = consecutive_failures + 1 < 5, last_error = %s WHERE id = %s""",
+                 (str(err)[:300], source_id))
 
 
 def snapshots_to_extract(conn, limit):
