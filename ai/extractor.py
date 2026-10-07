@@ -24,7 +24,7 @@ TEXT_FIELDS = ["name", "issuer", "city", "state_code", "opportunity_type", "fund
                "funding_min", "funding_max", "total_project_budget", "artist_budget", "match_requirement",
                "application_deadline", "deadline_timezone", "intent_to_apply_deadline", "cycle_label",
                "project_timeline", "installation_timeline", "application_requirements",
-               "contact_name", "contact_info"]
+               "contact_name", "contact_info", "geographic_scope", "applicant_types"]
 
 TOOL = {
     "name": "record_opportunities",
@@ -74,6 +74,8 @@ Rules:
 - Money: plain numbers without symbols (e.g. '25000').
 - If the page says a program is closed, paused, suspended, or 'check back', set page_says_closed=true.
 - A listing page may contain several programs: return each one separately.
+- geographic_scope: LOCAL (one city/county), STATE (statewide), REGIONAL (several states), NATIONAL, or INTERNATIONAL, based on who may apply or where the work happens. Quote the eligibility text.
+- applicant_types: who may apply, e.g. "individual artists", "LLCs", "nonprofits only". Quote it.
 - Planned construction, bond-funded projects, or master plans that mention public art but have no open call are capital project signals.
 Today's date: {today}."""
 
