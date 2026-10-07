@@ -51,7 +51,7 @@
   $("#signinBtn").addEventListener("click", async () => {
     const msg = $("#signinMsg"); msg.className = "msg"; msg.textContent = "Signing in…";
     const { error } = await sb.auth.signInWithPassword({ email: $("#email").value.trim(), password: $("#password").value });
-    if (error) { msg.className = "msg err"; msg.textContent = "That email and password didn't match. Check them and try again."; }
+       if (error) { msg.className = "msg err"; msg.textContent = "Sign-in failed: " + (error.message || "unknown error"); }
     else msg.textContent = "";
   });
   $("#password").addEventListener("keydown", e => { if (e.key === "Enter") $("#signinBtn").click(); });
